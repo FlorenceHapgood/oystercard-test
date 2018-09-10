@@ -3,9 +3,11 @@ class Oystercard
 
     def initialize(balance = 0)
         @balance = balance
+        @CAPACITY = 90
     end
 
-    def balance(balance)
-        balance
+    def top_up(balance)
+        raise "You cannot top up over £#{@CAPACITY}" if @balance >= @CAPACITY
+        @balance += balance
     end
 end
