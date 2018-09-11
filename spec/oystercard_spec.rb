@@ -37,13 +37,14 @@ describe Oystercard do
     context "touching in and out, and checking if it's in journey" do
         let(:card) { described_class.new }
         let(:tube_station) { double :tube_station}
+        let(:tube_exit) { double :tube_exit}
 
 
 
-        # it "determines if card is on a journey" do
-        #     allow(card).to receive(:in_journey?) { false }
-        #     expect(card.in_journey?).to eq false
-        # end
+        it "determines if card is on a journey" do
+            #sallow(card).to receive() { false }
+            expect(card.in_journey?).to eq false
+        end
 
         it "touches in, turning journey to true" do
             card = described_class.new(10)
@@ -53,7 +54,7 @@ describe Oystercard do
 
         it "touches out, turning journey to false" do
             allow(card).to receive(:in_journey?) { true }
-            expect(card.touch_out).to be_falsey
+            expect(card.touch_out(tube_exit)).to be_falsey
         end
 
         it "raises error if touching in with balance of less than 1" do
@@ -66,6 +67,8 @@ describe Oystercard do
             card.touch_in(tube_station)
            expect(card.entry_station).to eq [tube_station]
         end
+
+  
     end
 
 

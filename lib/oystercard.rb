@@ -20,8 +20,10 @@ class Oystercard
     end
 
     def in_journey?
-      if @entry_station == nil
-        @journey
+      if @entry_station == []
+        return false
+      else
+        return true
       end
     end
 
@@ -31,7 +33,7 @@ class Oystercard
         @journey = true
     end
 
-    def touch_out
+    def touch_out(exit)
         @journey = false
         @entry_station = nil
     end
