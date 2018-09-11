@@ -1,5 +1,5 @@
 class Oystercard
-    attr_reader :balance, :journey, :entry_station
+    attr_reader :balance, :journey, :entry_station, :station_log, :exit_station
 
 
     def initialize(balance = 0)
@@ -7,7 +7,9 @@ class Oystercard
         @CAPACITY = 90
         @MINIMUM = 1
         @journey = false
-        @entry_station = []
+        @entry_station
+        @station_log = []
+        @exit_station
     end
 
     def top_up(amount)
@@ -20,7 +22,7 @@ class Oystercard
     end
 
     def in_journey?
-      if @entry_station == []
+      if @entry_station == nil
         return false
       else
         return true
@@ -29,13 +31,17 @@ class Oystercard
 
     def touch_in(tube_station)
         raise "You're not passing with THAT balance" if @balance <= @MINIMUM
-        @entry_station << tube_station
+        @entry_station = tube_station
+        @station_log << tube_station
         @journey = true
     end
 
-    def touch_out(exit)
-        @journey = false
+    def touch_out(exit_station)
+
         @entry_station = nil
+        @exit_station = exit_station
+        @station_log << @exit_station
+        @journey = false
     end
 
 end

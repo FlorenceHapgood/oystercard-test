@@ -58,18 +58,38 @@ describe Oystercard do
         end
 
         it "raises error if touching in with balance of less than 1" do
-          oys = Oystercard.new
+             oys = Oystercard.new
             expect { oys.touch_in("station") }.to raise_error("You're not passing with THAT balance")
         end
 
         it "remembers entry station after touch in" do
-          card.top_up(5)
+            card.top_up(5)
             card.touch_in(tube_station)
-           expect(card.entry_station).to eq [tube_station]
+            expect(card.entry_station).to eq (tube_station)
         end
 
-  
+        let(:card) { described_class.new(10) }
+
+
+        it "stores the entry journeys in an array" do
+
+          card.touch_in(tube_station)
+          expect(card.station_log).to eq ([tube_station])
+        end
+
+
+        it "stores the exit journeys in an array" do
+          card.touch_out(tube_exit)
+          expect(card.station_log).to eq ([tube_exit])
+        end
+
+        # it "store the entry and exit stations as hashes" do
+        #   card.touch_in(tube_station)
+        #   card.touch_out(tube_exit)
+        #   expect(card.station_log) to eq .....
+        # 
+        end
+
+      end
+
     end
-
-
-end
