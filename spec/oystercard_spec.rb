@@ -36,60 +36,77 @@ describe Oystercard do
 
     context "touching in and out, and checking if it's in journey" do
         let(:card) { described_class.new }
-        let(:tube_station) { double :tube_station}
-        let(:tube_exit) { double :tube_exit}
+        let(:entry_station) { double :station } #so that it doesn't question what station is, because we don't have a station class at the moment
+        let(:exit_station) { double :station }
 
 
+        # it "determines if card is on a journey" do
+        #     allow(card).to receive(:in_journey?) { false }
+        #     expect(card.in_journey?).to eq false
+        # end
 
-        it "determines if card is on a journey" do
-            #sallow(card).to receive() { false }
-            expect(card.in_journey?).to eq false
-        end
+        # it "touches in, turning journey to true" do
+        #     card = described_class.new(10)
+        #     allow(card).to receive(:in_journey?) { false }
+        #     expect(card.touch_in(entry_station)).to eq true    #to be_truthy
+        # end
 
-        it "touches in, turning journey to true" do
-            card = described_class.new(10)
-            allow(card).to receive(:in_journey?) { false }
-            expect(card.touch_in(tube_station)).to eq true    #to be_truthy
-        end
-
-        it "touches out, turning journey to false" do
-            allow(card).to receive(:in_journey?) { true }
-            expect(card.touch_out(tube_exit)).to be_falsey
-        end
+        # it "touches out, turning journey to false" do
+        #     allow(card).to receive(:in_journey?) { true }
+        #     expect(card.touch_out).to be_falsey
+        # end
 
         it "raises error if touching in with balance of less than 1" do
-             oys = Oystercard.new
-            expect { oys.touch_in("station") }.to raise_error("You're not passing with THAT balance")
+            expect {card.touch_in(entry_station)}.to raise_error "You're not passing with THAT balance"
         end
 
-        it "remembers entry station after touch in" do
-            card.top_up(5)
-            card.touch_in(tube_station)
-            expect(card.entry_station).to eq (tube_station)
+        it "saves the entry station when you touch in" do
+          card = described_class.new(10)
+          card.touch_in(entry_station)
+
+          expect(card.entry_station).to eq (entry_station)
         end
 
-        let(:card) { described_class.new(10) }
+        it "set the entry station to nil when you touch out" do
+          card = described_class.new(10)
+          card.touch_out(exit_station)
 
-
-        it "stores the entry journeys in an array" do
-
-          card.touch_in(tube_station)
-          expect(card.station_log).to eq ([tube_station])
+          expect(card.entry_station).to eq nil
         end
 
+        it 'deducts fare when touching out' do
+          card = described_class.new(10)
 
-        it "stores the exit journeys in an array" do
-          card.touch_out(tube_exit)
-          expect(card.station_log).to eq ([tube_exit])
+          expect { card.touch_out(exit_station) }.to change{ card.balance }.by(-1)
         end
 
-        # it "store the entry and exit stations as hashes" do
-        #   card.touch_in(tube_station)
-        #   card.touch_out(tube_exit)
-        #   expect(card.station_log) to eq .....
-        # 
+        it "returns true if we are on a journey" do
+          card = described_class.new(10)
+          card.touch_in(entry_station)
+
+          expect(card.in_journey?).to eq true
         end
 
-      end
+        it "returns false if we are on a journey" do
+          card = described_class.new(10)
+          card.touch_out(exit_station)
 
+          expect(card.in_journey?).to eq false
+        end
+
+        it "saves the touch out station when touching out" do
+          card = described_class.new(10)
+          card.touch_out(exit_station)
+
+          expect(card.exit_station).to eq (exit_station)
+        end
+
+        it "perminantely saves the entry and exit stations" do
+          card = described_class.new(10)
+          card.touch_in(entry_station)
+          card.touch_out(exit_station)
+
+          expect(card.journey_log).to eq ([{entry: entry_station, exit: exit_station}])
+        end
     end
+end
