@@ -1,6 +1,7 @@
 require "oystercard"
 
 describe Oystercard do
+
     context "creating the oyster card" do
 
         it "expects no error when creating Oystercard instance" do
@@ -10,6 +11,7 @@ describe Oystercard do
         it "has a default balance of 0 unless stated otherwise" do
             expect(subject.balance).to eq 0
         end
+
 
     end
 
@@ -30,83 +32,70 @@ describe Oystercard do
         end
 
         it "deducts money from my card balance" do
-            expect(card.deduct(23)).to eq 67
+            expect { card.deduct }.to change { card.balance }.by(-card.journey.fare)
         end
     end
 
-    context "touching in and out, and checking if it's in journey" do
+    context "touching in, raises an error message if balance is less than 1" do
         let(:card) { described_class.new }
         let(:entry_station) { double :station } #so that it doesn't question what station is, because we don't have a station class at the moment
         let(:exit_station) { double :station }
 
-
-        # it "determines if card is on a journey" do
-        #     allow(card).to receive(:in_journey?) { false }
-        #     expect(card.in_journey?).to eq false
-        # end
-
-        # it "touches in, turning journey to true" do
-        #     card = described_class.new(10)
-        #     allow(card).to receive(:in_journey?) { false }
-        #     expect(card.touch_in(entry_station)).to eq true    #to be_truthy
-        # end
-
-        # it "touches out, turning journey to false" do
-        #     allow(card).to receive(:in_journey?) { true }
-        #     expect(card.touch_out).to be_falsey
-        # end
-
         it "raises error if touching in with balance of less than 1" do
             expect {card.touch_in(entry_station)}.to raise_error "You're not passing with THAT balance"
         end
+      end
+
+    context "touches in" do
+      let(:card) { described_class.new(10)}
+      let(:entry_station) { double :station } #so that it doesn't question what station is, because we don't have a station class at the moment
+      let(:exit_station) { double :station }
+      let(:journey) {double :journey, start: true}
 
         it "saves the entry station when you touch in" do
-          card = described_class.new(10)
           card.touch_in(entry_station)
-
           expect(card.entry_station).to eq (entry_station)
         end
 
-        it "set the entry station to nil when you touch out" do
-          card = described_class.new(10)
-          card.touch_out(exit_station)
+        it "starts a journey (with an entry station)" do
+          expect(card.touch_in(entry_station)).to eq (card.journey.start(entry_station))
+        end
 
+
+
+        it "set the entry station to nil when you touch out" do
+          card.touch_out(exit_station)
           expect(card.entry_station).to eq nil
         end
 
-        it 'deducts fare when touching out' do
-          card = described_class.new(10)
 
-          expect { card.touch_out(exit_station) }.to change{ card.balance }.by(-1)
+
+        it 'deducts fare when touching out' do
+
+          expect(card.touch_out(exit_station)).to eq(card.deduct)
+          #change{ card.balance }.by(-1)
         end
 
         it "returns true if we are on a journey" do
-          card = described_class.new(10)
           card.touch_in(entry_station)
-
           expect(card.in_journey?).to eq true
         end
 
         it "returns false if we are on a journey" do
-          card = described_class.new(10)
           card.touch_out(exit_station)
-
           expect(card.in_journey?).to eq false
         end
 
         it "saves the touch out station when touching out" do
-          card = described_class.new(10)
           card.touch_out(exit_station)
-
           expect(card.exit_station).to eq (exit_station)
         end
 
         it "perminantely saves the entry and exit stations" do
-          card = described_class.new(10)
           card.touch_in(entry_station)
           card.touch_out(exit_station)
-
           expect(card.journey_log).to eq ([{entry: entry_station, exit: exit_station}])
-        end
+
+      end
     end
 end
