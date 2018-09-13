@@ -35,4 +35,4 @@ class Oystercard
         deduct(1)
         @entry_station = nil
     end
-end
+  end
